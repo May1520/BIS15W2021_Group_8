@@ -4,30 +4,62 @@ output:
   html_document: 
     keep_md: yes
 ---
-```{r}
-
-```
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+library(tidyverse)
+library(janitor)
+library(here)
+library(naniar)
+library(skimr)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+covid <- read.csv("Data/WHO-COVID-19-global-data.csv")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+covid<-janitor::clean_names(covid)
+```
+
+```{r}
+head(covid)
+```
+```{r}
+glimpse(covid)
+```
+```{r}
+skim(covid)
+```
+#### NAs are represented by "NA" or "########"
+
+```{r}
+covid %>% 
+  group_by(country) %>% 
+  arrange(desc(cumulative_cases))
+```
+```{r}
+covid %>% 
+  filter(date_reported=="2021-02-11") %>% 
+  arrange(desc(cumulative_cases))
+```
+#### We're going vaccine data for the top 5 countries with the most COVID-19 cases to date.  USA, India, Brazil, Russian Federation, UK.
+
+```{r}
+covid %>% 
+  ggplot(aes(x=cumulative_cases))+geom_density()
+```
+##### We have to figure out how to make this not a logarithmic scale.
+
+##### We can use faceting to compare cases.
+
+##### Use pivot wide to analyze a single country over time.
+
+##### Create comparative plots
+
+##### Find data on populations + governments of these countries to compare the covid data. (Along with vaccine data)
+
+##### Maybe make a website that showcases our analysis of this data.

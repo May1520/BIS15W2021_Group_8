@@ -43,20 +43,34 @@ covid %>%
 ```
 ```{r}
 covid %>% 
-  filter(date_reported=="2021-02-11") %>% 
+  filter(nuo_daiate_reported=="2/11/2021") %>% 
   arrange(desc(cumulative_cases))
 ```
 #### We're going vaccine data for the top 5 countries with the most COVID-19 cases to date.  USA, India, Brazil, Russian Federation, UK.
 
 ```{r}
-covid %>% 
-  ggplot(aes(x=cumulative_cases))+geom_density()
+covid %>%
+  filter(nuo_daiate_reported=="2/11/2021")%>%
+  ggplot(aes(x=cumulative_cases))+
+           scale_y_log10()+
+           geom_density()
 ```
+```{r}
+covid %>%
+  filter(nuo_daiate_reported=="2/11/2021")%>%
+  ggplot(aes(x=cumulative_cases))+geom_point()
+```
+
 ##### We have to figure out how to make this not a logarithmic scale.
 
 ##### We can use faceting to compare cases.
 
 ##### Use pivot wide to analyze a single country over time.
+```{r}
+covid%>%
+  filter(country_code == "US")%>%
+  geom_plot(aes(x = "cumulative_cases", y="cumulative_cases"))
+```
 
 ##### Create comparative plots
 

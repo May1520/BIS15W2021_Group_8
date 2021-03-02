@@ -41,9 +41,40 @@ covid<-janitor::clean_names(covid)
 ```
 
 ```{r}
+glimpse(covid)
+```
+
+```{r}
+covid%>%
+  str_replace_all(i_date_reported, "/", "-")
+```
+
+
+```{r}
 names(covid)
 ```
 
+```{r}
+class()
+```
+
+```{r}
+lapply(covid, class)
+```
+
+
+```{r}
+#covid$i_date_reported <- as.factor(covid$i_date_reported)
+```
+
+```{r}
+glimpse(covid)
+```
+
+
+```{r}
+lapply(covid, class)
+```
 
 ```{r, eval=F, echo=T}
 ui <- dashboardPage(
@@ -65,13 +96,15 @@ ui <- dashboardPage(
 
 server <- function(input, output, session) { 
   output$plot <- renderPlot({
-  ggplot(covid, aes_string(x = input$x, y = input$y)) + geom_point(size=input$pointsize, alpha=0.8) + theme_light(base_size = 18)
+    ggplot(covid, aes_string(x = input$x, y = input$y)) + geom_point(size=input$pointsize, alpha=0.8) + theme_light(base_size = 18)
   })
   session$onSessionEnded(stopApp)
   }
 
 shinyApp(ui, server)
 ```
+
+
 
 ```{r}
 #install.packages("lubridate")
@@ -83,4 +116,50 @@ covid%>%
   ggplot(aes(x=i_date_reported, y=new_cases)) + geom_point()
   
 ```
+
+https://shiny.rstudio.com/articles/shiny-server.html
+
+http://www.sthda.com/english/wiki/ggplot2-axis-ticks-a-guide-to-customize-tick-marks-and-labels
+
+
+```{r, eval=F, echo=T}
+ui <- dashboardPage(
+  dashboardHeader(title = "Covid-19"),
+  dashboardSidebar(disable = T),
+  dashboardBody(
+  fluidRow(
+  box(title = "Plot Options", width = 3,
+  selectInput("x", "Select X Variable", choices = c("i_date_reported", "new_cases", "cumulative_cases", "new_deaths", "cumulative_deaths"), selected = "i_date_reported"),
+  selectInput("y", "Select Y Variable", choices = c("i_date_reported", "new_cases", "cumulative_cases", "new_deaths", "cumulative_deaths"), selected = "cumulative_cases"),
+   sliderInput("pointsize", "Select the Point Size", min = 1, max = 5, value = 2, step = 0.5)
+  ),
+  box(title = "Plot of Covid-19 cases and deaths", width = 7,
+  plotOutput("plot", width = "600px", height = "500px")
+  )
+  )
+  )
+)
+
+
+server <- function(input, output, session) { 
+  output$plot <- renderPlot({
+    covid%>%
+  filter(i_date_reported==input$x & new_cases==input$y & country==input$z)%>%
+  ggplot(covid, aes_string(x = input$x, y = input$y)) + geom_point(size=input$pointsize, alpha=0.8) + theme_light(base_size = 18)
+  })
+  session$onSessionEnded(stopApp)
+  }
+
+shinyApp(ui, server)
+```
+
+
+
+
+```{r}
+UC_admit %>% 
+      filter(Ethnicity==input$x & Campus==input$y & Category==input$z) %>% 
+      ggplot(aes(x=Academic_Yr, y=FilteredCountFR, fill=FilteredCountFR))
+```
+
 

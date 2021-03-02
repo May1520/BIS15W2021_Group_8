@@ -1,0 +1,102 @@
+---
+title: "COVID-19"
+output: 
+  html_document: 
+    keep_md: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(here)
+library(naniar)
+library(skimr)
+```
+
+
+```{r}
+covid <- read.csv("Data/WHO-COVID-19-global-data.csv")
+```
+
+```{r}
+covid<-janitor::clean_names(covid)
+```
+
+```{r}
+head(covid)
+```
+```{r}
+glimpse(covid)
+```
+```{r}
+skim(covid)
+```
+#### NAs are represented by "NA" or "########"
+
+```{r}
+covid$nuo_daiate_reported <- as.Date(covid$nuo_daiate_reported, format = "%m/%d/%Y")
+```
+
+```{r}
+covid %>% 
+  group_by(country) %>% 
+  arrange(desc(cumulative_cases))
+```
+```{r}
+covid %>% 
+  filter(nuo_daiate_reported== "2021-02-11") %>% 
+  arrange(desc(cumulative_cases))
+```
+#### We're going vaccine data for the top 5 countries with the most COVID-19 cases to date.  USA, India, Brazil, Russian Federation, UK.
+
+```{r}
+covid %>%
+  filter(nuo_daiate_reported=="2021-02-11")%>%
+  ggplot(aes(x=cumulative_cases))+
+           scale_y_log10()+
+           geom_density()
+```
+
+##### We have to figure out how to make this not a logarithmic scale.
+
+##### We can use faceting to compare cases.
+
+##### Use pivot wide to analyze a single country over time.
+```{r}
+covid$nuo_daiate_reported <- as.Date(covid$nuo_daiate_reported)
+covid$cumulative_cases <- as.numeric(as.character(covid$cumulative_cases))
+```
+
+```{r}
+covid%>%
+  filter(country_code == "US")%>%
+  ggplot(aes(x = nuo_daiate_reported, y = cumulative_cases))+
+  geom_line(aes(group = 1))+
+  scale_x_date(date_labels = "%Y-%m-%d")+
+  scale_x_date(date_breaks = "1 month")+
+  scale_y_continuous(breaks = seq(0, 30000000, by = 2500000), limits=c(0, 30000000))+
+  theme(axis.text.x=element_text(angle=45, hjust=1)) 
+```
+
+##### Create comparative plots
+```{r}
+covid%>%
+  group_by(country)%>%
+  filter(country_code == "US"| country_code == "IN"| country_code == "BR"| country_code == "RU"| country_code == "GB")%>%
+  ggplot(aes(x = nuo_daiate_reported, y = cumulative_cases, group = country, color = country))+
+  geom_line()+
+  scale_x_date(date_labels = "%Y-%m-%d")+
+  scale_x_date(date_breaks = "1 month")+
+  scale_y_continuous(breaks = seq(0, 30000000, by = 2500000), limits=c(0, 30000000))+
+  theme(axis.text.x=element_text(angle=45, hjust=1)) 
+```
+
+##### Find data on populations + governments of these countries to compare the covid data. (Along with vaccine data)
+```{r}
+
+```
+
+##### Maybe make a website that showcases our analysis of this data.

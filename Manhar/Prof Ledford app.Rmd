@@ -2,7 +2,9 @@
 title: "Prof ledford app"
 author: "me"
 date: "3/7/2021"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -74,7 +76,7 @@ server <- function(input, output, session) {
   output$plot <- renderPlot({
     covid %>% 
     filter(country==input$fill) %>% 
-    ggplot(aes_string(x = "i_date_reported", y = input$x)) + 
+    ggplot(aes_string(x = "i_date_reported", y = input$x, fill=input$x)) + 
     geom_col()
   })
 }
@@ -83,5 +85,68 @@ shinyApp(ui, server)
 ```
 
 
+
+****************************************
+
+
+
+
+Experiment- gradient color filled
+```{r, eval=F, echo=T}
+covid <- covid %>% 
+  select(i_date_reported, country, cumulative_cases, cumulative_deaths)
+
+ui <- dashboardPage(skin="purple",
+  dashboardHeader(title = "COVID Cumulative Plot"),
+  dashboardSidebar(disable = T),
+  dashboardBody(
+  fluidRow(
+  box(title = "Plot Options", width = 3,
+  selectInput("fill", "Select Country", choices =unique(covid$country)),
+  radioButtons("x", "Select X Variable", choices = c("cumulative_cases", "cumulative_deaths"), selected = "cumulative_cases"),
+  box(title = "Disease Abundance", width = 9,
+  plotOutput("plot", width = "800px", height = "500px", click="plot_click"),
+  verbatimTextOutput("info")
+  ) 
+  ) 
+  )
+  ) 
+  )
+
+server <- function(input, output, session) { 
+  
+  output$plot <- renderPlot({
+    covid %>% 
+    filter(country==input$fill) %>% 
+    ggplot(aes_string(x = "i_date_reported", y = input$x, fill=input$x)) +
+      geom_col()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+
+
+###PLOTS
+
+```{r}
+covid%>%
+  filter(i_date_reported=="2021-02-11")%>%
+  arrange(desc(cumulative_deaths))
+```
+
+```{r}
+### 5 highest cummulative cases on feb 11 2021: United States of America, India, Brazil, Russian Federation, The United Kingdom.
+###5 highest cummulative deaths on feb 11 2021: United States of America, Brazil, Mexico, India, The United Kingdom.
+```
+
+```{r}
+covid%>%
+  filter(i_date_reported=="2021-02-11")%>%
+  filter(country=="United States of America", country=="India", country=="Brazil", country=="Russian Federation", country=="The United Kingdom")
+  
+```
 
 

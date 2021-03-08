@@ -17,6 +17,7 @@ library(skimr)
 ```
 
 
+
 ```{r}
 covid <- read.csv("Data/WHO-COVID-19-global-data.csv")
 ```
@@ -36,9 +37,7 @@ skim(covid)
 ```
 #### NAs are represented by "NA" or "########"
 
-```{r}
-covid$nuo_daiate_reported <- as.Date(covid$nuo_daiate_reported, format = "%m/%d/%Y")
-```
+
 
 ```{r}
 covid %>% 
@@ -47,14 +46,14 @@ covid %>%
 ```
 ```{r}
 covid %>% 
-  filter(nuo_daiate_reported== "2021-02-11") %>% 
+  filter(date_reported== "2021-02-11") %>% 
   arrange(desc(cumulative_cases))
 ```
 #### We're going vaccine data for the top 5 countries with the most COVID-19 cases to date.  USA, India, Brazil, Russian Federation, UK.
 
 ```{r}
 covid %>%
-  filter(nuo_daiate_reported=="2021-02-11")%>%
+  filter(date_reported=="2021-02-11")%>%
   ggplot(aes(x=cumulative_cases))+
            scale_y_log10()+
            geom_density()
@@ -66,14 +65,14 @@ covid %>%
 
 ##### Use pivot wide to analyze a single country over time.
 ```{r}
-covid$nuo_daiate_reported <- as.Date(covid$nuo_daiate_reported)
+covid$date_reported <- as.Date(covid$date_reported)
 covid$cumulative_cases <- as.numeric(as.character(covid$cumulative_cases))
 ```
 
 ```{r}
 covid%>%
   filter(country_code == "US")%>%
-  ggplot(aes(x = nuo_daiate_reported, y = cumulative_cases))+
+  ggplot(aes(x = date_reported, y = cumulative_cases))+
   geom_line(aes(group = 1))+
   scale_x_date(date_labels = "%Y-%m-%d")+
   scale_x_date(date_breaks = "1 month")+
@@ -86,7 +85,7 @@ covid%>%
 covid%>%
   group_by(country)%>%
   filter(country_code == "US"| country_code == "IN"| country_code == "BR"| country_code == "RU"| country_code == "GB")%>%
-  ggplot(aes(x = nuo_daiate_reported, y = cumulative_cases, group = country, color = country))+
+  ggplot(aes(x = date_reported, y = cumulative_cases, group = country, color = country))+
   geom_line()+
   scale_x_date(date_labels = "%Y-%m-%d")+
   scale_x_date(date_breaks = "1 month")+

@@ -19,7 +19,9 @@ library(naniar)
 library(skimr)
 ```
 
-
+```{r}
+options(scipen = 999)
+```
 
 ```{r}
 covid <- read.csv("Data/WHO-COVID-19-global-data.csv")
@@ -91,16 +93,29 @@ covid%>%
 ```
 
 ```{r}
-covid%>% 
-  filter(country=="United States of America" | country=="China") %>%
-  select(i_date_reported, country, cumulative_cases)%>%
-  ggplot(aes(x=i_date_reported, group=country, fill=country))+
-  geom_density(alpha=0.2)+
-  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5))+
-  labs(title = "USA and China",
-       x="Date",
-       y="Cumulative cases")
+covid%>%
+  group_by(who_region)%>%
+  filter(who_region!="Other")%>%
+  select(i_date_reported, new_cases, who_region)%>%
+  ggplot(aes(x=who_region, y=new_cases, fill=who_region))+
+  geom_col()+scale_fill_brewer(palette = "Set2")+
+  labs(title = "Reported cases by Who region ",
+       x="Who region",
+       y="New Cases")+
+  theme(plot.title = element_text(size = rel(1.26), hjust = 0.5))
 ```
 
+```{r}
+covid%>%
+  group_by(who_region)%>%
+  filter(who_region!="Other")%>%
+  select(i_date_reported, new_deaths, who_region)%>%
+  ggplot(aes(x=who_region, y=new_deaths, fill=who_region))+
+  geom_col()+scale_fill_brewer(palette = "Set2")+
+  labs(title = "Reported deaths by Who region as of February 11 2021",
+       x="Who region",
+       y="New Deaths")+
+  theme(plot.title = element_text(size = rel(1.26), hjust = 0.5))
+```
 
 

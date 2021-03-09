@@ -1,0 +1,94 @@
+---
+title: "plots"
+author: "me"
+date: "3/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(here)
+library(naniar)
+library(skimr)
+```
+
+
+
+```{r}
+covid <- read.csv("Data/WHO-COVID-19-global-data.csv")
+```
+
+```{r}
+covid<-janitor::clean_names(covid)
+```
+
+```{r}
+names(covid)
+```
+
+```{r}
+covid%>%rename("i_date_reported"= "nuo_daiate_reported")
+```
+
+
+```{r}
+covid$i_date_reported <- lubridate::mdy(covid$i_date_reported)
+```
+
+
+```{r}
+covid$cumulative_cases <- as.numeric(as.character(covid$cumulative_cases))
+covid$cumulative_deaths <- as.numeric(as.character(covid$cumulative_deaths))
+covid$new_cases <- as.numeric(as.character(covid$new_cases))
+covid$new_deaths <- as.numeric(as.character(covid$new_deaths))
+```
+
+```{r}
+glimpse(covid)
+```
+
+
+```{r}
+covid%>%
+  select(i_date_reported, country, new_cases)%>%
+  filter(i_date_reported=="2021-02-11")%>%
+arrange(desc(new_cases))
+```
+
+```{r}
+covid%>%
+  filter(country=="United States of America"| country=="Brazil"| country=="Russian Federation" |country=="The United Kingdom"| country=="France")%>%
+  filter(i_date_reported=="2021-02-11")%>%
+  ggplot(aes(x=i_date_reported, y=new_cases, group=country, fill=country))+
+  geom_col(position="dodge")+scale_fill_brewer(palette = "Set3")+
+  labs(title = "Countries with highest reported new cases",
+       x="Date",
+       y="New Cases")+
+  theme(plot.title = element_text(size = rel(1.26), hjust = 0.5))
+```
+
+```{r}
+covid%>%
+  select(i_date_reported, country, new_deaths)%>%
+  filter(i_date_reported=="2021-02-11")%>%
+arrange(desc(new_deaths))
+```
+
+```{r}
+covid%>%
+  filter(country=="United States of America"| country=="Mexico"| country=="Brazil" |country=="The United Kingdom"| country=="Germany")%>%
+  filter(i_date_reported=="2021-02-11")%>%
+  ggplot(aes(x=i_date_reported, y=new_deaths, group=country, fill=country))+
+  geom_col(position="dodge")+scale_fill_brewer(palette = "Set3")+
+  labs(title = "Countries with highest reported new deaths",
+       x="Date",
+       y="New Deaths")+
+  theme(plot.title = element_text(size = rel(1.26), hjust = 0.5))
+```
